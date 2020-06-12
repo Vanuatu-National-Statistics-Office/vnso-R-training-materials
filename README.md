@@ -1,3 +1,5 @@
+![logo](logos/vnso_logo.png)
+
 # Vanuatu National Statistics Office
 
 ## R training materials
