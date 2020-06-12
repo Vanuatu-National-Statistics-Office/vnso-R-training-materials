@@ -1,2 +1,9 @@
-# vnso-R-training-materials
-A collection of R scripts for training within the Vanuatu National Statistics Office
+# Vanuatu National Statistics Office
+
+## R training materials
+
+A collection of R scripts for training within the Vanuatu National Statistics Office. 
+
+More detail on using and formatting markdown documents can be found [here](https://help.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax).
+
+[Here](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/about-readmes) is some more information about why and how we created **README** files for GitHub.
