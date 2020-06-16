@@ -268,7 +268,13 @@ Displacement<- mergedMotorCarTrendsWithoutDuplicates$Displacement
 boxplot(HorsePower, Displacement)
 
 # Remove extreme or outlier values
-boxplot.stats(mergedMotorCarTrendsWithoutDuplicates$HorsePower) #identifies outlier values 
+boxplotStats <- boxplot.stats(HorsePower) #identifies outlier values
+
+# Remove outliers from vector
+HorsePower <- HorsePower[HorsePower %in% boxplotStats$out == FALSE] # Remove outliers from vector of values
+
+# Replace outliers with NA value in data frame
+mergedMotorCarTrendsWithoutDuplicates$HorsePower[mergedMotorCarTrendsWithoutDuplicates$HorsePower %in% boxplotStats$out] <- NA
 
 ``` 
 
