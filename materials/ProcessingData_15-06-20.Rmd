@@ -267,7 +267,7 @@ HorsePower<- mergedMotorCarTrendsWithoutDuplicates$HorsePower # Can not always p
 Displacement<- mergedMotorCarTrendsWithoutDuplicates$Displacement
 boxplot(HorsePower, Displacement)
 
-# Remove extreme or outlier values
+# Identify outlier values
 boxplotStats <- boxplot.stats(HorsePower) #identifies outlier values
 
 # Remove outliers from vector
