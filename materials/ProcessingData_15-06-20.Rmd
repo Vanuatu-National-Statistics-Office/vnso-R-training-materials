@@ -1,0 +1,381 @@
+---
+title: "Steps for Cleaning and Processing Data"
+author: "Vanuatu National Statistics Office"
+date: "`r format(Sys.Date(), '%d %b %Y')`"
+output:
+  html_document:
+    number_sections: yes
+    toc: yes
+    toc_depth: '2'
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load required libraries, include=FALSE}
+library(knitr) # Nice tables
+library(kableExtra) # Extra nice tables
+```
+
+```{r functions, include=FALSE}
+prettyTable <- function(table){
+  
+  # Use the kable function to create a nicer formatted table
+  kable(table) %>%
+  
+    # Set the format
+    kable_styling(bootstrap_options="striped", # Set the colour of rows
+                  full_width=FALSE, # Make the table not stretch to fit the page
+                  position="left") %>% # Position the table on the left
+  
+    # Make the table scrollable
+    scroll_box(height = "400px")
+}
+```
+
+## Introduction
+
+In this tutorial we'll be learning about the steps involved in cleaning and processing our data. These steps are also important so we can spot any problems with the data early and limit their impact on our analyses. We'll be using the `mtcars` dataset in the current tutorial, this is a dataset that comes with every R installation. You can read more about these data [here](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html). The current tutorial was created using Rmarkdown - a powerful tool to help us create formatted using R code. If you're interested in using Rmarkdown, there is a great tutorial [here](https://rmarkdown.rstudio.com/lesson-1.html).
+
+## Loading required libraries
+
+The power of R is that millions of people are using it. R comes with a large set of `base` functions that we'll be using. Sometimes though it is useful to using some additional libraries. When storing data I would always recommend storing them as `csv` formatted files. However, it is useful to be able to work with excel formatted files directly. We can install and load libraries with the following code to work with excel formatted files:
+
+```{r installing libraries, eval=FALSE}
+install.packages("openxlsx") # We'll use this package to handle excel formatted spreadsheets
+```
+
+Once installed, load them with the following code:
+
+```{r load libraries, message=FALSE}
+# Load the openxlsx library
+library(openxlsx)
+```
+
+## Setting the working directory
+
+Next, we'll set the working directory - usually the folder on our computer where we have stored our data. We can use the following code for this:
+
+```{r set working directory}
+# Note the name of our working directory
+workingDirectory <- file.path("/Users/hugopigott/Dropbox/2. Work/Vanuatu National Statistics Office/Reproducible Analytical Pipelines/RTraining")
+
+# Set the working directory
+setwd(workingDirectory)
+```
+
+## Importing the data
+
+With our working directory set, we can now import some data. Today our data will be in `csv` (**C**omma, **S**eparated **V**alues) format, which is a standard format for storing a table in a simple text form.
+
+Here is some code to read in a csv file:
+```{r reading in data in csv format}
+motorCarTrends <- read.csv("Data/carInfo_27-05-20.csv", header= TRUE)
+```
+<!-- [THIS IS A COMMENT] Hugo - worth implementing a naming conventions so that files and folders are informatively named and dated -->
+
+Or we can use the following code to ask you to select a file:
+```{r selecting csv data file by user, eval=FALSE}
+motorCarTrends <- read.csv(file.choose(), header=TRUE)
+```
+
+Additionally, if the data was in 'xlsx' format we would import by:
+```{r reading in data in xlsx format, eval=FALSE}
+# Read in the xlsx file
+motorCarTrends <- read.xlsx("Data/carInfo_27-05-20.xlsx")
+```
+
+## Exploring the data
+
+### A quick look
+
+There are loads of functions that we can use in R to quickly explore our data. Making sure it is in the right format for our analyses down the line. It is can also be used to explore the underlying data for error detection. 
+
+```{r quick look at the data}
+# Check out the names of the MotorCarTrends variable
+names(motorCarTrends)
+
+# Check the class of the MotorCarTrends variable
+class(motorCarTrends)
+
+# Check the classes of each column in the MotorCarTrends dataframe
+colClasses <- sapply(motorCarTrends, FUN=class)
+print(colClasses)
+
+# Check the dimensions of the MotorCarTrends dataframe
+dim(motorCarTrends)
+
+# View the first 5 rows of the table
+head(motorCarTrends, n=5)
+
+# View the last 5 rows of the table
+tail(motorCarTrends, n=5)
+
+# Lastly let's print the table so we can interact with it
+prettyTable(motorCarTrends)
+```
+
+### Merging datasets
+
+To merge two datasets (data frames), use the merge function. In most cases, we join the data frames vertically by one or more common key variables.
+
+```{r merging datasets}
+# Read in dataframes that want to merge  
+motorCarPrices<- read.csv("Data/carPrices_27-05-20.csv") # motorCarTrends has already been read in
+
+# Check that the ID column in each table
+table(motorCarTrends$Id %in% motorCarPrices$Id)
+table(motorCarPrices$Id %in% motorCarTrends$Id)
+
+# Merge two data frames by the Id column
+mergedMotorCarTrends <- merge(motorCarTrends, motorCarPrices, by="Id")
+
+# Take a look at the new data
+head(mergedMotorCarTrends)
+```
+
+### Setting our column classes
+
+Some of the data in our `motorCarTrends` dataframe are categorical. We can tell R this to help us in our analyses down the line:
+
+```{r note categorical columns}
+# Set the engine shape and transmission type columns to be categorical
+mergedMotorCarTrends$vs <- as.factor(mergedMotorCarTrends$vs) # Engine shape
+mergedMotorCarTrends$am <- as.factor(mergedMotorCarTrends$am) # Transmission type
+
+# Take a look at the column classes again
+colClasses <- sapply(mergedMotorCarTrends, FUN=class)
+print(colClasses)
+
+# And take a look at the table again - note it hasn't changed
+head(mergedMotorCarTrends)
+```
+
+### Creating meaningful column names
+
+The column names `r colnames(mergedMotorCarTrends)` are quite difficult to interpret. We can rename the columns in the `mergedMotorCarTrends` dataframe with the following code:
+
+```{r renaming columns}
+# Create a vector of the new names
+newColumnNames <- c("IdentificationNumber","CarModel", "MilesPerGallon", "NumberOfCylinders", "Displacement", "HorsePower", "RearAxelRatio", "Weight", "TimeToQuarterMile", "EngineShape", "TransmissionType", "NumberForwardGears", "NumberOfCarburetors", "CostOfCar", "AgeOfBuyer", "GenderOfBuyer")
+
+# Rename the columns of the mergedMotorCarTrends dataframe
+colnames(mergedMotorCarTrends) <- newColumnNames
+
+# Take another look at the table
+head(mergedMotorCarTrends)
+```
+
+Notice that I didn't include any spaces in the column names. You can have spaces in your column names but not having them makes thing easier.
+
+### Calculating summary statistics
+
+We can calculate summary statistics for our data using the `str()` and `summary()` functions. The `str()` displays the structure of the dataframe. For the numeric data, the `summary()` provides summaries of the their distributions (range, average and quantiles). For the categorical data, the `summary()` function will count the number of entries in each category. They can also be used to explore the underlying data for error detection. 
+
+```{r display structure of the dataframe}
+str(mergedMotorCarTrends)
+```
+
+```{r calculate summary statistics}
+summary(mergedMotorCarTrends)
+```
+
+### Character manipulation 
+
+Often character data can be input in a number of different ways making it difficult to process. For instance Female might be coded as F, Fem, fem, Female. If this would be treated as a factor variable without any preprocessing, four not one class would be stored. Below we discuss an approach to string coding. 
+
+```{r character manipulation of the data}
+# base R solution to re-code gender column
+females <- c("Female", "Fem", "F")
+males <- c("Male", "M")
+mergedMotorCarTrends$GenderOfBuyer[mergedMotorCarTrends$GenderOfBuyer %in% females] <- "Female"
+mergedMotorCarTrends$GenderOfBuyer[mergedMotorCarTrends$GenderOfBuyer %in% males] <- "Male"
+
+# Another simpler solution solution
+mergedMotorCarTrends$GenderOfBuyer <- ifelse(grepl(pattern="^F", mergedMotorCarTrends$GenderOfBuyer), "Female", "Male")
+```
+
+### Removing duplicates
+
+Duplicates are data points that are repeated in your dataset. It often happens when data is combined from different sources or someone entering the data submits the entry mulitple times. First you have to investigate if there are  duplicates in the dataset before you either decide to keep or remove them. 
+
+```{r removing duplicates from the data}
+# Investigate for duplicates
+duplicatedRows <- which(duplicated(mergedMotorCarTrends)) #selects all replicated rows
+duplicatedRows
+mergedMotorCarTrendsWithoutDuplicates <- mergedMotorCarTrends[-duplicatedRows, ]
+```
+
+### Missing values
+
+We can delete missing values however data loss can lead to biases in our analysis. Additionally, we can replace missing values with constants such as mean, medians and modes. 
+
+```{r replace missing data}
+# Calculate percentage of missing data 
+calculatePercentageMissingData <- function(column, table) {
+  
+  # Count the number of NAs
+  numberNAs <- sum(is.na(table[, column])) # Why does this work?
+  
+  # Convert this to a proportion of values in column that are NA
+  proportionNAs <- numberNAs / nrow(table)
+  
+  # Return the proportion as a percentage
+  return(proportionNAs * 100)
+}
+
+# Use the function calculate the percentage of NAs in each column
+percentageNAs <- sapply(colnames(mergedMotorCarTrendsWithoutDuplicates), FUN=calculatePercentageMissingData, mergedMotorCarTrendsWithoutDuplicates)
+percentageNAs
+
+# Replace missing data with mean, median or mode values
+mergedMotorCarTrendsWithoutDuplicates$MilesPerGallon[which(is.na(mergedMotorCarTrendsWithoutDuplicates$MilesPerGallon))]<- 19.60 # mean of MilesPerGallon
+
+mergedMotorCarTrendsWithoutDuplicates$HorsePower[which(is.na(mergedMotorCarTrendsWithoutDuplicates$HorsePower))]<- 149 # mean of HorsePower
+
+mergedMotorCarTrendsWithoutDuplicates$TransmissionType[which(is.na(mergedMotorCarTrendsWithoutDuplicates$TransmissionType))]<- 0 # mode of TransmissionType
+
+# Check for missing values
+sum(is.na(mergedMotorCarTrendsWithoutDuplicates))
+```
+
+### Outliers 
+
+The `Inter-Quartile Range (IQR)` is a measure of variability and is often used to understand if a data point is an outlier. An outlier is a value that is significantly different from all other observations, and is visually represented using the `boxplot function`. Any data value that lies more than (1.5*IQR) away from the Q1 (lower limit) and Q3 (upper limit) quartiles is considered an outlier. They should not be removed unless there is good reason too.   
+
+IQR= 3rd Quartile (75th percentile) - 1st Quartile (25th percentile)
+Upper limit= mean + 1.5*IQR
+Lower limit= mean - 1.5*IQR
+
+```{r outliers}
+# Make a boxplot
+str(mergedMotorCarTrendsWithoutDuplicates)
+boxplot(mergedMotorCarTrendsWithoutDuplicates$HorsePower)
+
+# Make multiple boxplots on one axis 
+MilesPerGallon<- mergedMotorCarTrendsWithoutDuplicates$MilesPerGallon #Single variable to create a vector that will plot multiple boxplots  
+Weight<- mergedMotorCarTrendsWithoutDuplicates$Weight
+AgeOfBuyer<- mergedMotorCarTrendsWithoutDuplicates$AgeOfBuyer
+boxplot(MilesPerGallon, Weight, AgeOfBuyer)
+
+HorsePower<- mergedMotorCarTrendsWithoutDuplicates$HorsePower # Can not always put boxplots on same axis due to the range of values
+Displacement<- mergedMotorCarTrendsWithoutDuplicates$Displacement
+boxplot(HorsePower, Displacement)
+
+# Remove extreme or outlier values
+boxplot.stats(mergedMotorCarTrendsWithoutDuplicates$HorsePower) #identifies outlier values 
+
+``` 
+
+### Create new variable in the dataset
+
+In R programming often we will need to calculate new information from our existing dataset. To create a new column of information from the dataset we need to name the new variable, and the action we are taking (e.g. dividing a field by 10).
+
+```{r creating a new variable to the data}
+# Much simpmler base R approach
+mergedMotorCarTrendsWithoutDuplicates$CostPerMile <- mergedMotorCarTrendsWithoutDuplicates$MilesPerGallon / 10 #cost of gallon petrol is $10
+```
+
+### Categorising data
+
+R - Factors. Factors are the data objects which are used to categorize the data and store it as levels. They can store both strings and integers. They are useful in the columns which have a limited number of unique values.
+
+```{r creating a new variable to the data using factorising}
+# Categorising the ages of car buyers
+ageCuts <- seq(from=0, to=100, by=10)
+mergedMotorCarTrendsWithoutDuplicates$AgeCategories <- cut(mergedMotorCarTrendsWithoutDuplicates$AgeOfBuyer, breaks=ageCuts)
+```
+
+### Calculating summary statistics to check data is cleaned
+
+We can calculate summary statistics again to check if there are any erorrs in our data remaining before we begin the analysis. 
+
+```{r calculate summary statistics 2}
+str(mergedMotorCarTrendsWithoutDuplicates)
+```
+
+```{r calculate summary statistics 4}
+summary(mergedMotorCarTrendsWithoutDuplicates)
+```
+
+## Export cleaned dataset
+
+```{r export cleaned dataset}
+# Write the data to a csv file
+write.csv(mergedMotorCarTrendsWithoutDuplicates, file="carInfo-Prices_27-05-20.csv")
+```
+
+
+### Subsetting the data
+
+In R, we can select subsets of our data using the names or indices of rows or columns. When selecting subsets using row and column names/indices, we use the following format:
+`tableName[rows, columns]`
+
+Here are some examples about how to create subsets of the `motorCarTrends` dataframe:
+```{r subsetting the data}
+# Select the first 3 rows of the table
+first3Rows <- mergedMotorCarTrendsWithoutDuplicates[1:3, ] # Leaving the columns part blank means select all
+print(first3Rows)
+
+# Select the data for miles per gallon and horse power
+milesPerGallonAndHorsePower <- mergedMotorCarTrendsWithoutDuplicates[ , c("MilesPerGallon", "HorsePower")] # Select all rows and these columns
+head(milesPerGallonAndHorsePower)
+```
+
+We can use conditional statements to subset our data as well:
+
+```{r conditional subsetting}
+# Select the data for automatic cars with a high horsepower
+automaticCarData <- mergedMotorCarTrendsWithoutDuplicates[mergedMotorCarTrendsWithoutDuplicates$TransmissionType == 0 & mergedMotorCarTrendsWithoutDuplicates$HorsePower > 150, ]
+
+# Take a look at this subset
+prettyTable(automaticCarData)
+```
+
+## Plotting the data
+
+Is there a relationship between horsepower and the time it takes to travel a quarter of a mile?
+```{r plotting horsepower versus quarter mile travel time 1, echo=FALSE}
+plot(x=mergedMotorCarTrendsWithoutDuplicates$HorsePower, y=mergedMotorCarTrendsWithoutDuplicates$TimeToQuarterMile,
+     bty="n", # Remove box from around plot
+     pch=19, # Set the plotting shape
+     las=1, # Set the angle of tick labels to be horizontal
+     main="Does horse power affect speed?", # Add a plot title
+     ylab="Time to travel a quarter of a mile (seconds)", # Y axis label
+     xlab="Gross horse power", # X axis label
+     col="blue", # Set colour of points
+     cex=1.5) # Set the size of the points
+
+# Run a simple linear regression to test whether there is a relationship
+linearModelResults <- lm(TimeToQuarterMile ~ HorsePower, data=mergedMotorCarTrendsWithoutDuplicates)
+
+# Replace NA from the column HorsePower with the Mean HorsePower]
+
+mergedMotorCarTrendsWithoutDuplicates$HorsePower[is.na(mergedMotorCarTrendsWithoutDuplicates$HorsePower)] = 147
+
+# Generate some example horse power values - for predicting speed
+horsePowerValues <- seq(min(mergedMotorCarTrendsWithoutDuplicates$HorsePower), max(mergedMotorCarTrendsWithoutDuplicates$HorsePower), by=1)
+
+# Predict the time taken to travel a quarter mile for the example values
+confidenceIntervals <- predict(linearModelResults, newdata=data.frame(HorsePower=horsePowerValues),
+                               interval="confidence", # Record the confidence intervals around predicted values
+                               level=0.95) # Set the level for the confidence intervals
+
+# Add the confidence intervals onto the plot as a polygon
+polygon(x=c(horsePowerValues, rev(horsePowerValues)),
+        y=c(confidenceIntervals[, 2], rev(confidenceIntervals[,3])), 
+        col=rgb(1,0,0, 0.25), # Set the colour to be red and slightly transparent
+        border=NA) # Remove the border from around the polygon
+
+# Add a line of best fit to the plot
+lines(x=horsePowerValues, 
+      y=confidenceIntervals[, 1],
+      col="red", # Set the line colour to be red
+      lty=2, # Set the type of the line to be dashed
+      lwd=2) # Set the width of the line
+```
