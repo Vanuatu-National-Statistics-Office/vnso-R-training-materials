@@ -288,7 +288,11 @@ R - Factors. Factors are the data objects which are used to categorize the data 
 ```{r creating a new variable to the data using factorising}
 # Categorising the ages of car buyers
 ageCuts <- seq(from=0, to=100, by=10)
-mergedMotorCarTrendsWithoutDuplicates$AgeCategories <- cut(mergedMotorCarTrendsWithoutDuplicates$AgeOfBuyer, breaks=ageCuts)
+mergedMotorCarTrendsWithoutDuplicates$AgeCategories <- cut(mergedMotorCarTrendsWithoutDuplicates$AgeOfBuyer, 
+                                                           breaks=ageCuts,
+                                                           include.lowest=TRUE, # Include the loweest value in sequence (zero)
+                                                           right=FALSE # Closed on left "[" and open on right ")" e.g. [0, 10) means values <= 0 and < 10
+                                                           )
 ```
 
 ### Calculating summary statistics to check data is cleaned
