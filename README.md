@@ -1,4 +1,4 @@
-![logo](logos/vnso_logo.png)
+![logo](logos/vnso_logo.png)                         ![logo](logos/vangovlogo.png)
 
 # Vanuatu National Statistics Office
 
