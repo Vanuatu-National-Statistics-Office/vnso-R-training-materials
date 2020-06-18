@@ -1,4 +1,6 @@
-![logo](logos/vnso_logo.png)                         ![logo](logos/vangovlogo.png)
+
+<img align="left" src="logos/vnso_logo.png">
+<img align="right" src="logos/vangovlogo.png">
 
 # Vanuatu National Statistics Office
 
@@ -12,3 +14,4 @@ More detail on using and formatting markdown documents can be found [here](https
 
 To know more about the Vanautu National Statistics Office. Click [Here](https://vnso.gov.vu)
 
+</div>
