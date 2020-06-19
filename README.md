@@ -1,10 +1,14 @@
-![logo](logos/vnso_logo.png)
 
-#R training materials
+<img src="logos/vnso_logo.png">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="logos/vangovlogo.png">
+
+# Vanuatu National Statistics Office&nbsp;
 
 A collection of R scripts for training within the Vanuatu National Statistics Office (VNSO). With open source software such as R, there are now a range of tools and techniques that can be used to reduce production time, whilst maintaining and even improving the quality of official statistics. 
 
 > R is the language of statisticians and Data analysts. Particularly useful for Data analysis as it contains a number of built-in easy to use commands for organizing data and creating both numerical and graphical summaries of data. 
+
+To know more about the Vanautu National Statistics Office. Click [Here](https://vnso.gov.vu)
 
 ## Resources list
 - [Introduction to R](https://www.r-project.org)
@@ -29,3 +33,5 @@ A collection of R scripts for training within the Vanuatu National Statistics Of
     * Interactive tutorials on Tensorflow [here](https://tensorflow.rstudio.com/tutorials/) and Maps [here](https://rstudio.github.io/leaflet/)
     * Data Visualisation Resources [here](https://github.com/krzjoa/awesome-r-dataviz)
     * Official Statistics and Survey Methodlogy Pacakges [here](https://cran.r-project.org/web/views/OfficialStatistics.html)
+
+- [Here](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/about-readmes) is some more information about why and how we created **README** files for GitHub.
