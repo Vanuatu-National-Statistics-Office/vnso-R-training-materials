@@ -13,5 +13,3 @@ More detail on using and formatting markdown documents can be found [here](https
 [Here](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/about-readmes) is some more information about why and how we created **README** files for GitHub.
 
 To know more about the Vanautu National Statistics Office. Click [Here](https://vnso.gov.vu)
-
-</div>
