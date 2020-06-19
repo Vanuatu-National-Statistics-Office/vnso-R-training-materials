@@ -4,7 +4,7 @@
 
 A collection of R scripts for training within the Vanuatu National Statistics Office (VNSO). With open source software such as R, there are now a range of tools and techniques that can be used to reduce production time, whilst maintaining and even improving the quality of official statistics. 
 
-> R is an open source software and it is the language of statisticians and Data analysts. Particularly useful for Data analysis as it contains a number of built-in easy to use commands for organizing data and creating both numerical and graphical summaries of data. 
+> R is the language of statisticians and Data analysts. Particularly useful for Data analysis as it contains a number of built-in easy to use commands for organizing data and creating both numerical and graphical summaries of data. 
 
 ## Resources list
 - [Introduction to R](https://www.r-project.org)
