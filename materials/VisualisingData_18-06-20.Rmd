@@ -27,9 +27,9 @@ We'll be using the `carInfo-Prices_27-05-20.csv` dataframe, this is the dataset 
 
 Next, we'll set the working directory - usually the folder on our computer where we have stored our data. We can use the following code for this:
 
-```{r set working directory}
+```{r set working directory, eval=FALSE}
 # Note the name of our working directory
-workingDirectory <- file.path("")
+workingDirectory <- file.path("insert", "path", "to", "working", "directory", "here")
 
 # Set the working directory
 setwd(workingDirectory)
@@ -47,7 +47,7 @@ install.packages("ggplot2") # We'll use this package to visualise our data
 
 Once installed, load them with the following code:
 
-```{r load libraries}
+```{r load libraries, message=FALSE}
 # Load the libraries
 library(dplyr)
 library(ggplot2)
@@ -60,7 +60,7 @@ With our working directory set, we can now import some data. Today our data will
 
 Here is some code to read in a csv file:
 ```{r reading in data in csv format}
-completeMotorCarTrends <- read.csv("data", "carInfo-Prices_27-05-20.csv", header= TRUE)
+completeMotorCarTrends <- read.csv(file.path("..", "data", "carInfo-Prices_27-05-20.csv"), header= TRUE)
 ```
 <!-- [THIS IS A COMMENT] Hugo - worth implementing a naming conventions so that files and folders are informatively named and dated -->
 
@@ -141,6 +141,9 @@ Box plot is an excellent tool to study the distribution. It can also show the di
 
 Is the cost of fuel for car models distributed evenly?  
 ```{r Boxplot}
+# Calculate the cost per mile
+completeMotorCarTrends$CostPerMile <- 1/completeMotorCarTrends$MilesPerUSD
+
 #Prepare the data
 costPerMileBoxPlot <- completeMotorCarTrends[ , c("CarModel", "CostPerMile")] 
 head(costPerMileBoxPlot)
@@ -212,3 +215,11 @@ lines(x=horsePowerValues,
       lty=2, # Set the type of the line to be dashed
       lwd=2) # Set the width of the line
 ```
+
+Here is how we could produce a similar linear regression plot using ggplot code:
+```{r}
+ggplot(completeMotorCarTrends, aes(x=HorsePower, y=TimeToQuarterMile)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", fill="#69b3a2", se=TRUE)
+```
+
