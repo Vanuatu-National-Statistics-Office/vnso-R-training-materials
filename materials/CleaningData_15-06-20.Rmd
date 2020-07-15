@@ -14,12 +14,14 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+# Set global options for Rmarkdown document
+knitr::opts_chunk$set(echo=TRUE)
 ```
 
 ```{r load required libraries, include=FALSE}
 library(knitr) # Nice tables
 library(kableExtra) # Extra nice tables
+library(openxlsx) # Reading excel formatted tables
 ```
 
 ```{r functions, include=FALSE}
@@ -52,21 +54,22 @@ install.packages("openxlsx") # We'll use this package to handle excel formatted 
 
 Once installed, load them with the following code:
 
-```{r load libraries, message=FALSE}
+```{r load libraries, message=FALSE, eval=FALSE}
 # Load the openxlsx library
 library(openxlsx)
 ```
 
 ## Setting the working directory
 
+
 Next, we'll set the working directory - usually the folder on our computer where we have stored our data. We can use the following code for this:
 
-```{r set working directory}
-# Note the name of our working directory
-workingDirectory <- file.path()
+```{r set working directory, eval=FALSE}
+# Note the path to the working directory
+workingDirectory <- file.path("insert", "path", "to", "working", "directory", "here")
 
 # Set the working directory
-setwd(workingDirectory)
+setwd(repositoryPath)
 ```
 
 ## Importing the data
@@ -75,7 +78,7 @@ With our working directory set, we can now import some data. Today our data will
 
 Here is some code to read in a csv file:
 ```{r reading in data in csv format}
-motorCarTrends <- read.csv("data", "carInfo_27-05-20.csv", header= TRUE)
+motorCarTrends <- read.csv(file.path("..", "data", "carInfo_27-05-20.csv"), header=TRUE)
 ```
 <!-- [THIS IS A COMMENT] Hugo - worth implementing a naming conventions so that files and folders are informatively named and dated -->
 
@@ -87,7 +90,7 @@ motorCarTrends <- read.csv(file.choose(), header=TRUE)
 Additionally, if the data was in 'xlsx' format we would import by:
 ```{r reading in data in xlsx format, eval=FALSE}
 # Read in the xlsx file
-motorCarTrends <- read.xlsx("data", "carInfo_27-05-20.xlsx", header= TRUE)
+motorCarTrends <- read.xlsx(file.path("..", "data", "carInfo_27-05-20.xlsx"))
 ```
 
 ## Exploring the data
@@ -126,7 +129,7 @@ To merge two datasets (data frames), use the merge function. In most cases, we j
 
 ```{r merging datasets}
 # Read in dataframes that want to merge  
-motorCarPrices<- read.csv("data", "carPrices_27-05-20.csv", header = TRUE) # motorCarTrends has already been read in
+motorCarPrices<- read.csv(file.path("..", "data", "carPrices_27-05-20.csv"), header = TRUE) # motorCarTrends has already been read in
 
 # Check that the ID column in each table
 table(motorCarTrends$Id %in% motorCarPrices$Id)
@@ -282,8 +285,8 @@ mergedMotorCarTrendsWithoutDuplicates$HorsePower[mergedMotorCarTrendsWithoutDupl
 
 # or
 
-# Replace multiple values with NA value (parameters x, y)
-mergedMotorCarTrendsWithoutDuplicates$HorsePower[mergedMotorCarTrendsWithoutDuplicates$HorsePower %in% c(x,y)] <- NA
+# Replace multiple values with NA value
+mergedMotorCarTrendsWithoutDuplicates$HorsePower[mergedMotorCarTrendsWithoutDuplicates$HorsePower %in% c(-1,5000)] <- NA
 ``` 
 
 ### Create new variable in the dataset
@@ -291,8 +294,8 @@ mergedMotorCarTrendsWithoutDuplicates$HorsePower[mergedMotorCarTrendsWithoutDupl
 In R programming often we will need to calculate new information from our existing dataset. To create a new column of information from the dataset we need to name the new variable, and the action we are taking (e.g. dividing a field by 10).
 
 ```{r creating a new variable to the data}
-# Much simpmler base R approach
-mergedMotorCarTrendsWithoutDuplicates$MilesPerUSD <- mergedMotorCarTrendsWithoutDuplicates$MilesPerUSD / 10 #cost of gallon petrol is $10
+# Much simpler base R approach
+mergedMotorCarTrendsWithoutDuplicates$MilesPerUSD <- mergedMotorCarTrendsWithoutDuplicates$MilesPerGallon / 10 #cost of gallon petrol is $10
 ```
 
 ### Categorising data
@@ -353,5 +356,5 @@ prettyTable(automaticCarData)
 
 ```{r export cleaned dataset}
 # Write the data to a csv file
-write.csv(mergedMotorCarTrendsWithoutDuplicates, file="carInfo-Prices_27-05-20.csv")
+write.csv(mergedMotorCarTrendsWithoutDuplicates, file=file.path("..", "data", "carInfo-Prices_27-05-20.csv"))
 ```
