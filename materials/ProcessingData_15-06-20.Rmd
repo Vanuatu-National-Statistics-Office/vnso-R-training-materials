@@ -57,25 +57,13 @@ Once installed, load them with the following code:
 library(openxlsx)
 ```
 
-## Setting the working directory
-
-Next, we'll set the working directory - usually the folder on our computer where we have stored our data. We can use the following code for this:
-
-```{r set working directory}
-# Note the name of our working directory
-workingDirectory <- file.path("/Users/hugopigott/Dropbox/2. Work/Vanuatu National Statistics Office/Reproducible Analytical Pipelines/RTraining")
-
-# Set the working directory
-setwd(workingDirectory)
-```
-
 ## Importing the data
 
 With our working directory set, we can now import some data. Today our data will be in `csv` (**C**omma, **S**eparated **V**alues) format, which is a standard format for storing a table in a simple text form.
 
 Here is some code to read in a csv file:
 ```{r reading in data in csv format}
-motorCarTrends <- read.csv("Data/carInfo_27-05-20.csv", header= TRUE)
+motorCarTrends <- read.csv("data/carInfo_27-05-20.csv", header= TRUE)
 ```
 <!-- [THIS IS A COMMENT] Hugo - worth implementing a naming conventions so that files and folders are informatively named and dated -->
 
@@ -87,7 +75,7 @@ motorCarTrends <- read.csv(file.choose(), header=TRUE)
 Additionally, if the data was in 'xlsx' format we would import by:
 ```{r reading in data in xlsx format, eval=FALSE}
 # Read in the xlsx file
-motorCarTrends <- read.xlsx("Data/carInfo_27-05-20.xlsx")
+motorCarTrends <- read.xlsx("data/carInfo_27-05-20.xlsx")
 ```
 
 ## Exploring the data
@@ -126,7 +114,7 @@ To merge two datasets (data frames), use the merge function. In most cases, we j
 
 ```{r merging datasets}
 # Read in dataframes that want to merge  
-motorCarPrices<- read.csv("Data/carPrices_27-05-20.csv") # motorCarTrends has already been read in
+motorCarPrices<- read.csv("data/carPrices_27-05-20.csv") # motorCarTrends has already been read in
 
 # Check that the ID column in each table
 table(motorCarTrends$Id %in% motorCarPrices$Id)
