@@ -1,5 +1,5 @@
 ---
-title: "Steps for Cleaning and Processing Data"
+title: "Steps for Cleaning Data"
 author: "Vanuatu National Statistics Office"
 date: "`r format(Sys.Date(), '%d %b %Y')`"
 output:
@@ -14,12 +14,14 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+# Set global options for Rmarkdown document
+knitr::opts_chunk$set(echo=TRUE)
 ```
 
 ```{r load required libraries, include=FALSE}
 library(knitr) # Nice tables
 library(kableExtra) # Extra nice tables
+library(openxlsx) # Reading excel formatted tables
 ```
 
 ```{r functions, include=FALSE}
@@ -40,7 +42,7 @@ prettyTable <- function(table){
 
 ## Introduction
 
-In this tutorial we'll be learning about the steps involved in cleaning and processing our data. These steps are also important so we can spot any problems with the data early and limit their impact on our analyses. We'll be using the `mtcars` dataset in the current tutorial, this is a dataset that comes with every R installation. You can read more about these data [here](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html). The current tutorial was created using Rmarkdown - a powerful tool to help us create formatted using R code. If you're interested in using Rmarkdown, there is a great tutorial [here](https://rmarkdown.rstudio.com/lesson-1.html).
+In this tutorial we'll be learning about the steps involved in **cleaning** our data. These steps are also important so we can spot any problems with the data early and limit their impact on our analyses. We'll be using the `mtcars` dataset in the current tutorial, this is a dataset that comes with every R installation. You can read more about these data [here](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html). The current tutorial was created using Rmarkdown - a powerful tool to help us create formatted using R code. If you're interested in using Rmarkdown, there is a great tutorial [here](https://rmarkdown.rstudio.com/lesson-1.html).
 
 ## Loading required libraries
 
@@ -52,9 +54,22 @@ install.packages("openxlsx") # We'll use this package to handle excel formatted 
 
 Once installed, load them with the following code:
 
-```{r load libraries, message=FALSE}
+```{r load libraries, message=FALSE, eval=FALSE}
 # Load the openxlsx library
 library(openxlsx)
+```
+
+## Setting the working directory
+
+
+Next, we'll set the working directory - usually the folder on our computer where we have stored our data. We can use the following code for this:
+
+```{r set working directory, eval=FALSE}
+# Note the path to the working directory
+workingDirectory <- file.path("insert", "path", "to", "working", "directory", "here")
+
+# Set the working directory
+setwd(repositoryPath)
 ```
 
 ## Importing the data
@@ -63,7 +78,7 @@ With our working directory set, we can now import some data. Today our data will
 
 Here is some code to read in a csv file:
 ```{r reading in data in csv format}
-motorCarTrends <- read.csv("data/carInfo_27-05-20.csv", header= TRUE)
+motorCarTrends <- read.csv(file.path("..", "data", "carInfo_27-05-20.csv"), header=TRUE)
 ```
 <!-- [THIS IS A COMMENT] Hugo - worth implementing a naming conventions so that files and folders are informatively named and dated -->
 
@@ -75,7 +90,7 @@ motorCarTrends <- read.csv(file.choose(), header=TRUE)
 Additionally, if the data was in 'xlsx' format we would import by:
 ```{r reading in data in xlsx format, eval=FALSE}
 # Read in the xlsx file
-motorCarTrends <- read.xlsx("data/carInfo_27-05-20.xlsx")
+motorCarTrends <- read.xlsx(file.path("..", "data", "carInfo_27-05-20.xlsx"))
 ```
 
 ## Exploring the data
@@ -114,7 +129,7 @@ To merge two datasets (data frames), use the merge function. In most cases, we j
 
 ```{r merging datasets}
 # Read in dataframes that want to merge  
-motorCarPrices<- read.csv("data/carPrices_27-05-20.csv") # motorCarTrends has already been read in
+motorCarPrices<- read.csv(file.path("..", "data", "carPrices_27-05-20.csv"), header = TRUE) # motorCarTrends has already been read in
 
 # Check that the ID column in each table
 table(motorCarTrends$Id %in% motorCarPrices$Id)
@@ -222,11 +237,9 @@ percentageNAs <- sapply(colnames(mergedMotorCarTrendsWithoutDuplicates), FUN=cal
 percentageNAs
 
 # Replace missing data with mean, median or mode values
-mergedMotorCarTrendsWithoutDuplicates$MilesPerGallon[which(is.na(mergedMotorCarTrendsWithoutDuplicates$MilesPerGallon))]<- 19.60 # mean of MilesPerGallon
+mergedMotorCarTrendsWithoutDuplicates$MilesPerGallon[which(is.na(mergedMotorCarTrendsWithoutDuplicates$MilesPerGallon))]<- mean(mergedMotorCarTrendsWithoutDuplicates$MilesPerGallon, na.rm= TRUE) # mean of MilesPerGallon
 
-mergedMotorCarTrendsWithoutDuplicates$HorsePower[which(is.na(mergedMotorCarTrendsWithoutDuplicates$HorsePower))]<- 149 # mean of HorsePower
-
-mergedMotorCarTrendsWithoutDuplicates$TransmissionType[which(is.na(mergedMotorCarTrendsWithoutDuplicates$TransmissionType))]<- 0 # mode of TransmissionType
+mergedMotorCarTrendsWithoutDuplicates$TransmissionType[which(is.na(mergedMotorCarTrendsWithoutDuplicates$TransmissionType))]<- 0 # mode of TransmissionType taken from summary statistics
 
 # Check for missing values
 sum(is.na(mergedMotorCarTrendsWithoutDuplicates))
@@ -242,7 +255,6 @@ Lower limit= mean - 1.5*IQR
 
 ```{r outliers}
 # Make a boxplot
-str(mergedMotorCarTrendsWithoutDuplicates)
 boxplot(mergedMotorCarTrendsWithoutDuplicates$HorsePower)
 
 # Make multiple boxplots on one axis 
@@ -251,19 +263,30 @@ Weight<- mergedMotorCarTrendsWithoutDuplicates$Weight
 AgeOfBuyer<- mergedMotorCarTrendsWithoutDuplicates$AgeOfBuyer
 boxplot(MilesPerGallon, Weight, AgeOfBuyer)
 
-HorsePower<- mergedMotorCarTrendsWithoutDuplicates$HorsePower # Can not always put boxplots on same axis due to the range of values
+# Can not always put boxplots on same axis due to the range of values
+HorsePower<- mergedMotorCarTrendsWithoutDuplicates$HorsePower 
 Displacement<- mergedMotorCarTrendsWithoutDuplicates$Displacement
 boxplot(HorsePower, Displacement)
 
 # Identify outlier values
-boxplotStats <- boxplot.stats(HorsePower) #identifies outlier values
+boxplotStats <- boxplot.stats(mergedMotorCarTrendsWithoutDuplicates$HorsePower) #identifies outlier values
 
 # Remove outliers from vector
-HorsePower <- HorsePower[HorsePower %in% boxplotStats$out == FALSE] # Remove outliers from vector of values
+HorsePower <- mergedMotorCarTrendsWithoutDuplicates$HorsePower[mergedMotorCarTrendsWithoutDuplicates$HorsePower %in% boxplotStats$out == FALSE] # Remove outliers from vector of values
+HorsePower
 
-# Replace outliers with NA value in data frame
+# Replace all outliers with NA value in data frame
 mergedMotorCarTrendsWithoutDuplicates$HorsePower[mergedMotorCarTrendsWithoutDuplicates$HorsePower %in% boxplotStats$out] <- NA
 
+# or
+
+# Replace a single value with NA
+mergedMotorCarTrendsWithoutDuplicates$HorsePower[mergedMotorCarTrendsWithoutDuplicates$HorsePower == 335] <- NA
+
+# or
+
+# Replace multiple values with NA value
+mergedMotorCarTrendsWithoutDuplicates$HorsePower[mergedMotorCarTrendsWithoutDuplicates$HorsePower %in% c(-1,5000)] <- NA
 ``` 
 
 ### Create new variable in the dataset
@@ -271,8 +294,8 @@ mergedMotorCarTrendsWithoutDuplicates$HorsePower[mergedMotorCarTrendsWithoutDupl
 In R programming often we will need to calculate new information from our existing dataset. To create a new column of information from the dataset we need to name the new variable, and the action we are taking (e.g. dividing a field by 10).
 
 ```{r creating a new variable to the data}
-# Much simpmler base R approach
-mergedMotorCarTrendsWithoutDuplicates$CostPerMile <- mergedMotorCarTrendsWithoutDuplicates$MilesPerGallon / 10 #cost of gallon petrol is $10
+# Much simpler base R approach
+mergedMotorCarTrendsWithoutDuplicates$MilesPerUSD <- mergedMotorCarTrendsWithoutDuplicates$MilesPerGallon / 10 #cost of gallon petrol is $10
 ```
 
 ### Categorising data
@@ -299,13 +322,6 @@ str(mergedMotorCarTrendsWithoutDuplicates)
 
 ```{r calculate summary statistics 4}
 summary(mergedMotorCarTrendsWithoutDuplicates)
-```
-
-## Export cleaned dataset
-
-```{r export cleaned dataset}
-# Write the data to a csv file
-write.csv(mergedMotorCarTrendsWithoutDuplicates, file="carInfo-Prices_27-05-20.csv")
 ```
 
 
@@ -335,45 +351,10 @@ automaticCarData <- mergedMotorCarTrendsWithoutDuplicates[mergedMotorCarTrendsWi
 prettyTable(automaticCarData)
 ```
 
-## Plotting the data
 
-Is there a relationship between horsepower and the time it takes to travel a quarter of a mile?
-```{r plotting horsepower versus quarter mile travel time 1, echo=FALSE}
-plot(x=mergedMotorCarTrendsWithoutDuplicates$HorsePower, y=mergedMotorCarTrendsWithoutDuplicates$TimeToQuarterMile,
-     bty="n", # Remove box from around plot
-     pch=19, # Set the plotting shape
-     las=1, # Set the angle of tick labels to be horizontal
-     main="Does horse power affect speed?", # Add a plot title
-     ylab="Time to travel a quarter of a mile (seconds)", # Y axis label
-     xlab="Gross horse power", # X axis label
-     col="blue", # Set colour of points
-     cex=1.5) # Set the size of the points
+## Export cleaned dataset
 
-# Run a simple linear regression to test whether there is a relationship
-linearModelResults <- lm(TimeToQuarterMile ~ HorsePower, data=mergedMotorCarTrendsWithoutDuplicates)
-
-# Replace NA from the column HorsePower with the Mean HorsePower]
-
-mergedMotorCarTrendsWithoutDuplicates$HorsePower[is.na(mergedMotorCarTrendsWithoutDuplicates$HorsePower)] = 147
-
-# Generate some example horse power values - for predicting speed
-horsePowerValues <- seq(min(mergedMotorCarTrendsWithoutDuplicates$HorsePower), max(mergedMotorCarTrendsWithoutDuplicates$HorsePower), by=1)
-
-# Predict the time taken to travel a quarter mile for the example values
-confidenceIntervals <- predict(linearModelResults, newdata=data.frame(HorsePower=horsePowerValues),
-                               interval="confidence", # Record the confidence intervals around predicted values
-                               level=0.95) # Set the level for the confidence intervals
-
-# Add the confidence intervals onto the plot as a polygon
-polygon(x=c(horsePowerValues, rev(horsePowerValues)),
-        y=c(confidenceIntervals[, 2], rev(confidenceIntervals[,3])), 
-        col=rgb(1,0,0, 0.25), # Set the colour to be red and slightly transparent
-        border=NA) # Remove the border from around the polygon
-
-# Add a line of best fit to the plot
-lines(x=horsePowerValues, 
-      y=confidenceIntervals[, 1],
-      col="red", # Set the line colour to be red
-      lty=2, # Set the type of the line to be dashed
-      lwd=2) # Set the width of the line
+```{r export cleaned dataset}
+# Write the data to a csv file
+write.csv(mergedMotorCarTrendsWithoutDuplicates, file=file.path("..", "data", "carInfo-Prices_27-05-20.csv"))
 ```

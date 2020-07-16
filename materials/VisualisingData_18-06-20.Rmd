@@ -17,27 +17,6 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r load required libraries, include=FALSE}
-library(knitr) # Nice tables
-library(kableExtra) # Extra nice tables
-```
-
-```{r functions, include=FALSE}
-prettyTable <- function(table){
-  
-  # Use the kable function to create a nicer formatted table
-  kable(table) %>%
-  
-    # Set the format
-    kable_styling(bootstrap_options="striped", # Set the colour of rows
-                  full_width=FALSE, # Make the table not stretch to fit the page
-                  position="left") %>% # Position the table on the left
-  
-    # Make the table scrollable
-    scroll_box(height = "400px")
-}
-```
-
 ## Introduction
 
 The world today is filled with data and it becomes imperative that we analyse it properly to gain meaningful insights. Data Visualisation is a vital tool that can unearth possible crucial insights from data. If the results of an analysis are not visualised properly, it will not be communicated effectively to the desired audience. In this tutorial, we will learn how to analyze and display data using R statistical language. R is extremely flexible and easy to use when it comes to creating visualisations. 
@@ -48,9 +27,9 @@ We'll be using the `carInfo-Prices_27-05-20.csv` dataframe, this is the dataset 
 
 Next, we'll set the working directory - usually the folder on our computer where we have stored our data. We can use the following code for this:
 
-```{r set working directory}
+```{r set working directory, eval=FALSE}
 # Note the name of our working directory
-workingDirectory <- file.path("/Users/hugopigott/Dropbox/2. Work/Vanuatu National Statistics Office/Reproducible Analytical Pipelines/RTraining")
+workingDirectory <- file.path("insert", "path", "to", "working", "directory", "here")
 
 # Set the working directory
 setwd(workingDirectory)
@@ -61,14 +40,14 @@ setwd(workingDirectory)
 
 The power of R is that millions of people are using it. R comes with a large set of `base` functions that we'll be using. Sometimes though it is useful to use some additional libraries.  We can install and load libraries with the following code to visualise our data:
 
-```{r installing libraries}
+```{r installing libraries, eval=FALSE}
 install.packages("dplyr") # We'll use this package to manipulate and analyse our data 
 install.packages("ggplot2") # We'll use this package to visualise our data
 ```
 
 Once installed, load them with the following code:
 
-```{r load libraries}
+```{r load libraries, message=FALSE}
 # Load the libraries
 library(dplyr)
 library(ggplot2)
@@ -81,51 +60,12 @@ With our working directory set, we can now import some data. Today our data will
 
 Here is some code to read in a csv file:
 ```{r reading in data in csv format}
-completeMotorCarTrends <- read.csv("Data/carInfo-Prices_27-05-20.csv", header= TRUE)
+completeMotorCarTrends <- read.csv(file.path("..", "data", "carInfo-Prices_27-05-20.csv"), header= TRUE)
 ```
 <!-- [THIS IS A COMMENT] Hugo - worth implementing a naming conventions so that files and folders are informatively named and dated -->
 
-Or we can use the following code to ask you to select a file:
-```{r selecting csv data file by user, eval=FALSE}
-motorCarTrends <- read.csv(file.choose(), header=TRUE)
-```
-
-
 ## Visualising the Data
 
-### Lollipop Chart
-Lollipop charts conveys the same information as in bar charts. By reducing the thick bars into thin lines, it reduces the clutter and lays more emphasis on the value. It looks nice and modern. 
-
-Do citizens spend more on their vehicles as they advance in years?   
-```{r Lollipop chart}
-#Prepare data
-groupedCompleteMotorCarTrends<- group_by(completeMotorCarTrends, AgeCategories)
-summariseCompleteMotorCarTrends<- summarise(groupedCompleteMotorCarTrends, mean_carModel= mean(CostOfCar))
-
-# Plot
-ggplot(summariseCompleteMotorCarTrends, aes(x=AgeCategories, y=mean_carModel)) +
-  geom_point(size=3) + geom_segment(aes(x=AgeCategories,
-                                        xend=AgeCategories,
-                                        y=0,
-                                        yend=mean_carModel)) +
-  labs(title="Avg. Cost in USDs spent on Car", caption="source: mpg") +
-  theme(axis.text.x = element_text(angle=65, vjust= 0.6))
-```
-
-### Grouped Bar Chart
-Grouped bar charts are used when two or more data sets are displayed side-by-side and grouped together under categories on the same axis. It is essentially a simple bar chart with two or more graphs. 
-
-Are men spending more on vehicles then women?
-```{r Grouped bar chart}
-#Prepare data
-costOfCarMeans<- completeMotorCarTrends %>% group_by(GenderOfBuyer, AgeCategories) %>%
-  summarise(mean= mean(CostOfCar))
-
-#Plot
-ggplot(costOfCarMeans, aes(x=AgeCategories , y=mean, fill=GenderOfBuyer)) + 
-  geom_bar(stat= "identity", position= "dodge") +
-  labs(title="Avg. Cost in USDs spent on Car by Gender") 
-```
 
 ### Ordered Bar Chart
 Ordered Bar Chart is a Bar Chart that is ordered by the Y axis variable. Just sorting the dataframe by the variable of interest isn’t enough to order the bar chart. In order for the bar chart to retain the order of the rows, the X axis variable (i.e. the categories) has to be converted into a factor.
@@ -148,6 +88,8 @@ ggplot(milesPerGallonCars, aes(x=`Car Model`, y=`Av. Miles per Gallon`)) +
   geom_bar(stat="identity", width=.5, fill="blue") + labs(title="Average number of Miles Car is able to Travel per Gallon") +
   theme(axis.text.x = element_text(angle=65, vjust=0.6)) 
 ```
+
+
 ### Horizontal Bar Chart
 Horizontal bar chart is a slight variation on the vertical bar chart, with the primary difference being the inverted positions of the x-axis and y-axis. To invert the positions of the x and y axis, add the 'coord_flip()' function. The Ordered Bar Chart above has been made into a horizontal bar chart below. 
 
@@ -157,11 +99,51 @@ ggplot(milesPerGallonCars, aes(x=`Car Model`, y=`Av. Miles per Gallon`)) +
   geom_bar(stat="identity", width=.5, fill="blue") + labs(title="Average number of Miles Car is able to Travel per Gallon") + coord_flip()  
 ```
 
+
+### Grouped Bar Chart
+Grouped bar charts are used when two or more data sets are displayed side-by-side and grouped together under categories on the same axis. It is essentially a simple bar chart with two or more graphs. 
+
+Are men spending more on vehicles then women?
+```{r Grouped bar chart}
+#Prepare data
+costOfCarMeans<- completeMotorCarTrends %>% group_by(GenderOfBuyer, AgeCategories) %>%
+  summarise(mean= mean(CostOfCar))
+
+#Plot
+ggplot(costOfCarMeans, aes(x=AgeCategories , y=mean, fill=GenderOfBuyer)) + 
+  geom_bar(stat= "identity", position= "dodge") +
+  labs(title="Avg. Cost in USDs spent on Car by Gender") 
+```
+
+
+### Lollipop Chart
+Lollipop charts conveys the same information as in bar charts. By reducing the thick bars into thin lines, it reduces the clutter and lays more emphasis on the value. It looks nice and modern. 
+
+Do citizens spend more on their vehicles as they advance in years?   
+```{r Lollipop chart}
+#Prepare data
+groupedCompleteMotorCarTrends<- group_by(completeMotorCarTrends, AgeCategories)
+summariseCompleteMotorCarTrends<- summarise(groupedCompleteMotorCarTrends, mean_carModel= mean(CostOfCar))
+
+# Plot
+ggplot(summariseCompleteMotorCarTrends, aes(x=AgeCategories, y=mean_carModel)) +
+  geom_point(size=3) + geom_segment(aes(x=AgeCategories,
+                                        xend=AgeCategories,
+                                        y=0,
+                                        yend=mean_carModel)) +
+  labs(title="Avg. Cost in USDs spent on Car", caption="source: mpg") +
+  theme(axis.text.x = element_text(angle=65, vjust= 0.6))
+```
+
+
 ### Boxplot
 Box plot is an excellent tool to study the distribution. It can also show the distributions within multiple groups, along with the median, range and outliers if any. The dark line inside the box represents the median. The top of box is 75%ile and bottom of box is 25%ile. The end points of the lines (aka whiskers) is at a distance of 1.5*IQR, where IQR or Inter Quartile Range is the distance between 25th and 75th percentiles. The points outside the whiskers are marked as dots and are normally considered as extreme points.
 
 Is the cost of fuel for car models distributed evenly?  
 ```{r Boxplot}
+# Calculate the cost per mile
+completeMotorCarTrends$CostPerMile <- 1/completeMotorCarTrends$MilesPerUSD
+
 #Prepare the data
 costPerMileBoxPlot <- completeMotorCarTrends[ , c("CarModel", "CostPerMile")] 
 head(costPerMileBoxPlot)
@@ -172,7 +154,7 @@ print(colClasses)
 # Create dataset of vehicle types
 Sedan <- c("Cadillac", "Mercedes", "Hornet", "Mazda", "Datsun", "Toyota", "Volvo")
 Sports <- c("Maserati", "Porsche", "Ferrari", "Lotus")
-Pickup<- "Ford"
+Pickup<- c("Ford")
 Compact<- c("Fiat", "Fiat", "Honda")
 
 costPerMileBoxPlot$CarModel[costPerMileBoxPlot$CarModel %in% Sedan] <- "Sedan"
@@ -182,35 +164,16 @@ costPerMileBoxPlot$CarModel[costPerMileBoxPlot$CarModel %in% Compact] <- "Compac
 
 # Plot
 Plot<- ggplot(costPerMileBoxPlot, aes(CarModel, CostPerMile))
-Plot + geom_boxplot(varwidth = T, fill= "plum") +
+Plot + geom_boxplot(varwidth = TRUE, fill= "plum") +
   labs(title= "Cost per Mile grouped by Model of Vehicle",
        caption= "Source: VNSO",
        x= "Model of Vehicle",
        y= "Cost per Mile")
 ```
 
+
 ### Scatter Plot
 Scatter plot is a graph in which values of two variables are plotted along two axes, the pattern of the resulting points reveals if any correlation is present (relationship between two variables). It is the most frequently used plot for data analysis. 
-
-Is there 
-```{r Scatter plot}
-plot(x=completeMotorCarTrends$CostOfCar, y=completeMotorCarTrends$CostPerMile,
-     bty="n", # Remove box from around plot
-     pch=19, # Set the plotting shape
-     las=1, # Set the angle of tick labels to be horizontal
-     main="Does spending more on your vehicle reduce your cost on fuel?", # Add a plot title
-     ylab="Cost per mile (USDs)", # Y axis label
-     xlab="Cost of Vehicle", # X axis label
-     col="blue", # Set colour of points
-     cex=1.5) # Set the size of the points
-
-# Run a simple linear regression to test whether there is a relationship
-linearModelResults <- lm(CostPerMile ~ CostOfCar, data=completeMotorCarTrends)
-linearModelResults
-
-# Plotting regression line
-abline(lm(CostPerMile ~ CostOfCar))
-```
 
 Is there a relationship between horsepower and the time it takes to travel a quarter of a mile?
 ```{r plotting horsepower versus quarter mile travel time 1}
@@ -252,3 +215,11 @@ lines(x=horsePowerValues,
       lty=2, # Set the type of the line to be dashed
       lwd=2) # Set the width of the line
 ```
+
+Here is how we could produce a similar linear regression plot using ggplot code:
+```{r}
+ggplot(completeMotorCarTrends, aes(x=HorsePower, y=TimeToQuarterMile)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", fill="#69b3a2", se=TRUE)
+```
+
