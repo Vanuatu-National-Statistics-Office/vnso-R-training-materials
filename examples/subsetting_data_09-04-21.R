@@ -15,5 +15,6 @@ subset_of_historic_data <- historic_exports_data[1:10, c("Date", "Month", "HS")]
 # Select high value commodities being exported
 # Inside square brackets we can use conditions - here we are using it to select export commodities whose value was above 10,000,000
 # The dollar sign ($) is another way of selecting a column from a dataframe
+# More information on subsetting here: https://r-coder.com/subset-r/#:~:text=You%20can%20subset%20a%20column,rows%20of%20the%20data%20frame).
 high_value_exports <- 
   historic_exports_data[historic_exports_data$Value > 10000000, ] # Left columns here blank to select all columns
