@@ -57,8 +57,7 @@ nRows <- nrow(tradeBalanceByCountryOther)
 ggplot(data = tradeBalanceByCountryOther[c(1:5, (nRows-4):nRows), ], 
        aes(x = reorder(country, -balance), y = balance)) +
   geom_bar(stat = "identity") +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
-  ggtitle("Trade balance by country",
-          subtitle = "Top 5 exporters and top 5 importers") +
-  xlab("") + 
-  ylab("Trade Balance")
+  ylab("Trade Balance") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
+        axis.title.x = element_blank())
