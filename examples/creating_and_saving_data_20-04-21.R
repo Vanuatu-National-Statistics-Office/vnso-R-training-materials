@@ -34,4 +34,9 @@ summary_statistics <- example_data %>%
             Maximum = max(Value),
             Sum = sum(Value), .groups = "drop")
 
-# Merging
+# Merging two different datasets
+more_example_data <- data.frame(
+  "ID" = 1:100,
+  "Weight" = runif(n = 100, min = 100, max = 200)
+)
+combined_data <- merge(example_data, more_example_data, by = "ID")
