@@ -1,17 +1,22 @@
+# Load the required libraries
+library(dplyr) # Manipulating data - install.packages("dplyr")
+library(ggplot2) # Plotting data - install.packages("ggplot2")
+
 # Set the working directory to current file's location
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 # Read in some data
 historic_exports_file <- file.path("..", "..", "vnso-RAP-tradeStats-materials", "data", "secure", "historical_export_99_19.csv")
-historic_exports_data <- read.csv(historic_exports_file)
+historic_exports <- read.csv(historic_exports_file)
 
-# Load the required libraries
-library(dplyr) # Manipulating data - install.packages("dplyr")
-library(ggplot2) # Plotting data - install.packages("ggplot2")
+# Working with dates
+dates <- as.Date(historic_exports$Date, 
+                 format = "%d/%m/%Y")
+years <- format(dates, "%Y")
 
 # Calculate summary statistics of Value by year
 historic_exports_by_year <-
-  historic_exports_data %>%
+  historic_exports %>%
   filter(is.na(Value) == FALSE) %>%
   group_by(Year) %>%
   summarise(mean = mean(Value),
@@ -24,13 +29,37 @@ historic_exports_by_year <-
 # Create a plot of median value by year
 historic_exports_by_year %>%
   ggplot(aes(x = Year, y = median)) +
-    geom_line(color = "red") +
-    geom_point() +
-    geom_text(aes(label = round(median/10000, digits = 0)), vjust = -1) +
+    geom_col(alpha = 0.5) +
+    geom_line(color = "red", linetype = "dashed", size = 1.5) +
+    geom_point(color = "blue") +
+    #geom_text(aes(label = round(median/10000, digits = 0)), vjust = -1, size = 5, colour = "blue") +
     labs(title = "Statistic value of exports",
         x ="Year", y = "Value")
 
-# Working with dates
-dates <- as.Date(historic_exports_data$Date, 
-                 format = "%d/%m/%Y")
-years <- format(dates, "%Y")
+# Create histogram of Statistical Value distribution in 2015
+historic_exports %>%
+  filter(Year == 2015) %>%
+  ggplot() +
+    geom_histogram(aes(x = Value), bins = 100, fill = "red", alpha = 0.5, col = "black") +
+    labs(title = "Statistic value distribution", subtitle = "Exports in 2015",
+         x ="Value", y = "Count")
+
+# Create a scatter plot of weight versus quantity
+historic_exports %>%
+  ggplot() +
+    geom_point(aes(x = Weight, y = Supp_Qty, col = Pkg._Type), alpha = 0.25) +
+    xlim(0, 1000) +
+    ylim(0, 1000) +
+    labs(title = "Comparing quantity and weight", subtitle = "Coloured by packaging type",
+         y = "Supply Quantity", col = "Packaging type")
+
+
+# Create a boxplot of value by year
+historic_exports %>%
+  ggplot(aes(x = factor(Year), y = Value)) +
+    geom_jitter(color = "red", size = 0.4, alpha = 0.1) +
+    geom_boxplot(outlier.shape = NA, alpha = 0.5) +
+    ylim(0, 5000) +
+    labs(title = "Statistical value distribution through time",
+         subtitle = "Rescaled axis excludes many points!",
+         x = "Year")
