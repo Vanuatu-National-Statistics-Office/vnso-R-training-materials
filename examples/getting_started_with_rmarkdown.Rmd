@@ -1,0 +1,77 @@
+---
+title: "Getting started with Rmarkdown"
+author: "Vanuatu National Statistics Office"
+date: "25/05/2021"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE)
+```
+
+# Introduction
+
+A report with some examples of the historic trades statistics data for **Vanuatu**. To work with the data we will load these required libraries:
+
+```{r preparation, message = FALSE}
+# Load the required libraries
+library(dplyr) # Manipulating data - install.packages("dplyr")
+library(ggplot2) # Plotting data - install.packages("ggplot2")
+library(DT) # Creating formatted html tables
+```
+
+# Viewing the data
+
+The trade statistics data can be read in with the following code:
+
+```{r load data}
+# Read in some data
+historic_exports_file <- file.path("..", "..", "vnso-RAP-tradeStats-materials", "data", "secure", "historical_export_99_19.csv")
+historic_exports <- read.csv(historic_exports_file)
+
+# View the data
+historic_exports[1:25, ] %>% datatable(options = list(pageLength = 10))
+```
+
+# Summarising the data
+
+We can generate summaries of the data with this code:
+
+```{r generate summary statistics}
+# Calculate summary statistics of Value by year
+historic_exports_by_year <-
+  historic_exports %>%
+  filter(is.na(Value) == FALSE) %>%
+  group_by(Year) %>%
+  summarise(mean = mean(Value),
+            min = min(Value),
+            max = max(Value),
+            sum = sum(Value),
+            median = median(Value), 
+            .groups = "drop")
+```
+
+Which creates:
+
+```{r view summary statistics}
+historic_exports_by_year %>% datatable()
+```
+
+# Plotting the data
+HGere is a plot of the total exports by year:
+
+```{r plot exports by year}
+# Create a plot of median value by year
+historic_exports_by_year %>%
+  ggplot() +
+    aes(x = Year, y = median) +
+    geom_col(alpha = 0.5) +
+    geom_line(color = "red", linetype = "dashed", size = 1.5) +
+    geom_point(color = "blue") +
+    labs(title = "Statistic value of exports",
+         x ="Year", y = "Value")
+```
+
