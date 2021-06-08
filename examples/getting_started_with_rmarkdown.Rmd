@@ -14,6 +14,8 @@ knitr::opts_chunk$set(echo = TRUE, eval = TRUE)
 
 # Introduction
 
+## First part of the introduction
+
 A report with some examples of the historic trades statistics data for **Vanuatu**. To work with the data we will load these required libraries:
 
 ```{r preparation, message = FALSE}
@@ -22,6 +24,21 @@ library(dplyr) # Manipulating data - install.packages("dplyr")
 library(ggplot2) # Plotting data - install.packages("ggplot2")
 library(DT) # Creating formatted html tables
 ```
+
+## Second part of the introduction
+
+Here is an example plot:
+
+### An example of creating a plot
+
+```{r create simple plot}
+example_data <- data.frame("Value" = rnorm(500))
+
+example_data %>% 
+  ggplot() +
+    geom_histogram(aes(x = Value), bins = 10)
+```
+
 
 # Viewing the data
 
