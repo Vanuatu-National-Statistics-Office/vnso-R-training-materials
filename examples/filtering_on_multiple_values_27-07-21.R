@@ -25,8 +25,19 @@ historic_exports_banknotes <- historic_exports %>%
   filter(HS == "49070010")
 
 # Select commodities being exported to Australia and New Zealand
-histroci_exports_AU_NZ <- historic_exports %>%
+historic_exports_AU_NZ <- historic_exports %>%
   filter(CTY_Dest %in% c("AU", "NZ"))
+
+# Send sfiltered/subsetted data into further operations
+AU_NZ_exports_summary <- historic_exports_AU_NZ %>%
+  filter(is.na(Value) == FALSE & Year >= 2015) %>%    # Remove NA values and select data from 2015
+  group_by(CTY_Dest, Year) %>%                        # Aggregate data by destination country and year
+  summarise(mean_value = mean(Value),                 # Summarise aggregated data using - mean
+            total_value = sum(Value),                 #                                 - total
+            min_value = min(Value),                   #                                 - min
+            max_value = max(Value),                   #                                 - max
+            .groups = "drop")                         # Don't keep the grouping structure set by group_by - no longer needed
+
 
 ## Filtering using subset() function
 
