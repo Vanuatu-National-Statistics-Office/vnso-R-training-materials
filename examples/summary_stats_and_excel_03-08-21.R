@@ -29,10 +29,10 @@ columns <- c("Dec.09", "Mar.10", "Jun.10", "Sep.10", "Dec.10")
 cpi_data[columns] <- sapply(cpi_data[columns], FUN = as.numeric)
 
 # Calculate the row means for select columns
-row_means_for_selected_means <- rowMeans(cpi_data[, columns], na.rm = TRUE)
+row_means_for_selected_columns <- rowMeans(cpi_data[, columns], na.rm = TRUE)
 
-
-
+# Calculate the row sums for selected columns
+row_sums_for_selected_columns <- rowSums(cpi_data[, columns], na.rm = TRUE)
 
 #### Extracting sheets from excel file ####
 
