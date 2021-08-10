@@ -2,7 +2,7 @@
 
 # Load the required libraries
 library(dplyr) # Manipulating data - install.packages("dplyr")
-library(readxl) # Reading excel file
+library(readxl) # Reading excel file - see resources here: https://readxl.tidyverse.org/
 
 # Set the working directory to current file's location
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
