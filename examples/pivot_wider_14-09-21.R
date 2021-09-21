@@ -47,3 +47,45 @@ colnames(travel_summary_wide_percentage) <- paste(colnames(travel_summary_wide_p
 
 # Add percentage columns into main table
 travel_summary_with_percentages <- cbind(travel_summary_wide, travel_summary_wide_percentage)
+
+#### Combining value and percentage into single columns ####
+
+# Initialise a dataframe to store the combined values and percentages
+travel_summary_final <- data.frame("GROUP" = travel_summary_wide$GROUP)
+
+# Note the columns of interest
+columns_of_interest <- colnames(travel_summary_wide)[
+  c(-1, -ncol(travel_summary_wide))
+]
+
+# Add in each column with combined value and percentage
+for(travel_type_column in columns_of_interest){
+  
+  # Create column name with percentage
+  travel_type_column_as_percentage <- paste(travel_type_column, "(percentage)")
+  
+  # Get the counts for current travel type
+  # Note use of "drop" - this extracts the values as a vector instead of data.frame
+  travel_type_counts <- travel_summary_wide[, travel_type_column, drop = TRUE]
+  
+  # Get the counts as percentages
+  # Note use of "drop" - this extracts the values as a vector instead of data.frame
+  travel_type_percentages <- travel_summary_wide_percentage[, 
+                                                            travel_type_column_as_percentage,
+                                                            drop = TRUE]
+  
+  # Round the percentages
+  travel_type_percentages <- round(travel_type_percentages, digits = 0)
+
+  # Create column with combined value and percentage
+  travel_summary_final[, column_of_interest] <- paste(
+    travel_type_counts, " (", travel_type_percentages, "%)", sep = ""
+  )
+}
+
+# Add the Total column
+travel_summary_final$Total <- travel_summary_wide$Total
+
+# Remove the percentages from final row
+number_rows <- nrow(travel_summary_final)
+travel_summary_final[number_rows, ] <- travel_summary_wide[number_rows, ]
