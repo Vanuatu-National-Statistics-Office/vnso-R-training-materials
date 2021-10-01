@@ -78,7 +78,7 @@ for(travel_type_column in columns_of_interest){
   travel_type_percentages <- round(travel_type_percentages, digits = 0)
 
   # Create column with combined value and percentage
-  travel_summary_final[, column_of_interest] <- paste(
+  travel_summary_final[, travel_type_column_as_percentage] <- paste(
     travel_type_counts, " (", travel_type_percentages, "%)", sep = ""
   )
 }
